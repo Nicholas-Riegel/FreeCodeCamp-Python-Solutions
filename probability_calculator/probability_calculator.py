@@ -17,30 +17,36 @@ class Hat:
                     self.contents.append(k)
                     v -= 1
 
-    def draw(self, x):
-        random.shuffle(self.contents)
-        self.draw_contents = self.contents[:x]
-        return self.draw_contents
-# I'm not sure why this method doesn't pass the test
+    def draw(self, num_to_draw):
+        self.drawn = list()
+        if num_to_draw >= len(self.contents):
+            self.drawn = self.contents
+            self.contents = []
+            return self.drawn
+        else:
+            while num_to_draw > 0:
+                self.drawn.append(self.contents.pop(random.randrange(0, len(self.contents))))
+                num_to_draw -= 1
+            return self.drawn
+
 
 # Experiment function
 
 def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
-    
-    # seems num_balls_drawn has to be >= expected_balls, no?
 
     num_experiments0 = num_experiments
     match = 0
     while num_experiments0 > 0:
-        
+
         drawn_balls_dict = dict()
-        drawn_balls_list = hat.draw(num_balls_drawn)
+        newHat = copy.deepcopy(hat)
+        drawn_balls_list = newHat.draw(num_balls_drawn)
         for x in drawn_balls_list:
             if x in drawn_balls_dict.keys():
                 drawn_balls_dict[x] += 1
             else:
                 drawn_balls_dict[x] = 1
-        
+
         count = 0
         for k, v in expected_balls.items():
             if k in drawn_balls_dict.keys() and drawn_balls_dict[k] >= v:
@@ -49,10 +55,7 @@ def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
                 match += 1
 
         num_experiments0 -= 1
-    
+
     return match/num_experiments
 
-hat0 = Hat(blue=3, red=2, green=6)
-print(experiment(hat0, {'blue': 2, 'green': 1}, 4, 1000))
-# print(hat0.draw(2) )
-# print(hat0.contents)
+
